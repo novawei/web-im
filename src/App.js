@@ -5,9 +5,13 @@ const React = require('react');
 const XMPPClient = require('./vendor/strophe/xmppclient');
 
 class App extends React.Component {
+
   constructor(props) {
     super(props);
-    XMPPClient.getInstance().config('192.168.1.104', 'web-im');
+    this.client = XMPPClient.getInstance();
+    this.client.config('192.168.1.104', 'web-im');
+
+    this.handlers = [];
     this.state = {
       username: 'admin',
       status: '未登录',
@@ -17,11 +21,25 @@ class App extends React.Component {
   }
 
   componentWillMount() {
-    XMPPClient.getInstance().login('admin', 'admin');
+    let handler;
+    handler = this.client.addHandler(XMPPClient.HandlerType.CONNECT, this.onConnect);
+    this.handlers.push(handler);
+    handler = this.client.addHandler(XMPPClient.HandlerType.IQ, this.onIQ);
+    this.handlers.push(handler);
+    handler = this.client.addHandler(XMPPClient.HandlerType.PRESENCE, this.onPresence);
+    this.handlers.push(handler);
+    handler = this.client.addHandler(XMPPClient.HandlerType.MESSAGE, this.onMessage);
+    this.handlers.push(handler);
+
+    this.client.login('admin', 'admin');
   }
 
   componentWillUnmount() {
-    //this.conn.disconnect();
+    this.client.disconnect();
+
+    for (let i = 0, len = this.handlers.length; i < len; i++) {
+      this.client.removeHandler(this.handlers[i]);
+    }
   }
 
   translateStatus(status) {
@@ -40,64 +58,59 @@ class App extends React.Component {
     return status < list.length ? list[status] : '未知状态';
   }
 
-  // onConnect(status) {
-  //   this.setState({...this.state, status: this.translateStatus(status)});
-  //   if (status == Strophe.Status.CONNECTED) {
-  //     this.conn.addHandler(this.onIQ.bind(this), null, 'iq', null, null, null);
-  //     this.conn.addHandler(this.onMessage.bind(this), null, 'message', null, null, null);
-  //     this.conn.addHandler(this.onPresence.bind(this), null, 'presence', null, null, null);
-  //     this.conn.sendPresence($pres(), null, null, 6000);
-  //     this.conn.sendIQ($iq({type: 'get'}).c('query', {xmlns: 'com:nfs:mucextend:room'}));
-  //     //connection.sendIQ($iq({type: 'get'}).c('query', {xmlns: 'com:nfs:mucextend:user', roomID: 1}));
-  //     //connection.sendIQ($iq({type: 'get'}).c('query', {xmlns: 'com:nfs:msghistory:query', type: 'chat', peer: 'novawei', pageNum: 1, pageSize: 5}));
-  //   }
-  // }
-  //
-  // onIQ(element) {
-  //   let query = element.getElementsByTagName("query");
-  //   if (query && query.length > 0) {
-  //     query = query[0];
-  //     if (query.getAttribute("xmlns") == 'com:nfs:mucextend:room') {
-  //       let elementList = query.getElementsByTagName("room");
-  //       let roomList = [];
-  //       for (let i = 0; i < elementList.length; i++) {
-  //         let element = elementList[i];
-  //         let room = {
-  //           roomID: element.getAttribute('roomID'),
-  //           name: element.getAttribute('name'),
-  //           naturalName: element.getAttribute('naturalName'),
-  //           description: element.getAttribute('description')
-  //         };
-  //         roomList.push(room);
-  //       }
-  //       this.setState({...this.state, roomList: roomList});
-  //     }
-  //   }
-  //   return true;
-  // }
-  //
-  // onMessage(element) {
-  //   let body = element.getElementsByTagName('body');
-  //   if (body && body.length > 0) {
-  //     body = body[0];
-  //     let msgList = [...this.state.msgList];
-  //     let msg = {
-  //       id: element.getAttribute('id'),
-  //       from: element.getAttribute('from'),
-  //       to: element.getAttribute('to'),
-  //       type: element.getAttribute('type'),
-  //       body: body.textContent
-  //     }
-  //     msgList.push(msg);
-  //     this.setState({...this.state, msgList: msgList});
-  //   }
-  //   return true;
-  // }
-  //
-  // onPresence(element) {
-  //   console.log(element);
-  //   return true;
-  // }
+  onConnect(status) {
+    console.log(status);
+    if (status == XMPPClient.Status.SUCCESS) {
+      this.client.conn.sendPresence($pres());
+    }
+  }
+
+  onIQ(element) {
+    console.log(element);
+    // let query = element.getElementsByTagName("query");
+    // if (query && query.length > 0) {
+    //   query = query[0];
+    //   if (query.getAttribute("xmlns") == 'com:nfs:mucextend:room') {
+    //     let elementList = query.getElementsByTagName("room");
+    //     let roomList = [];
+    //     for (let i = 0; i < elementList.length; i++) {
+    //       let element = elementList[i];
+    //       let room = {
+    //         roomID: element.getAttribute('roomID'),
+    //         name: element.getAttribute('name'),
+    //         naturalName: element.getAttribute('naturalName'),
+    //         description: element.getAttribute('description')
+    //       };
+    //       roomList.push(room);
+    //     }
+    //     this.setState({...this.state, roomList: roomList});
+    //   }
+    // }
+    // return true;
+  }
+
+  onMessage(element) {
+    console.log(element);
+    // let body = element.getElementsByTagName('body');
+    // if (body && body.length > 0) {
+    //   body = body[0];
+    //   let msgList = [...this.state.msgList];
+    //   let msg = {
+    //     id: element.getAttribute('id'),
+    //     from: element.getAttribute('from'),
+    //     to: element.getAttribute('to'),
+    //     type: element.getAttribute('type'),
+    //     body: body.textContent
+    //   }
+    //   msgList.push(msg);
+    //   this.setState({...this.state, msgList: msgList});
+    // }
+    // return true;
+  }
+
+  onPresence(element) {
+    console.log(element);
+  }
 
   render() {
     return (
