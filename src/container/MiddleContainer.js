@@ -3,6 +3,7 @@
  */
 const React = require('react');
 const RoomList = require('../component/RoomList');
+const ChatList = require('../component/ChatList');
 require('../resource/css/middle.css');
 
 class MiddleContainer extends React.Component {
@@ -13,7 +14,7 @@ class MiddleContainer extends React.Component {
   render() {
     let component = null;
     if (this.props.selectedIndex == 0) {
-      component = (<div>消息列表</div>);
+      component = <ChatList chatList={this.props.chatList}/>
     } else if (this.props.selectedIndex == 1) {
       component = (<div>联系人列表</div>);
     } else {

@@ -77,18 +77,24 @@ class App extends React.Component {
   }
 
   onMessage(json) {
-    console.log(json);
-    let chatList = this.state.chatList;
-    for (let msg of chatList) {
-      if (msg.from  )
+    let chatList = [...this.state.chatList];
+    let index = -1;
+    for (let i = 0, len = chatList.length; i < len; i++) {
+      let msg = chatList[i];
+      if (msg.from == json.from) {
+        index = i;
+        break;
+      }
     }
-    let chatMap = this.state.chatMap;
-    chatMap[json.from] = json;
-
+    if (index >= 0) {
+      chatList.splice(index, 1);
+    }
+    chatList.splice(0, 0, json);
+    this.setState({...this.state, chatList: chatList});
   }
 
   onPresence(json) {
-    console.log(json);
+
   }
 
   handleSelectIndex(index) {
@@ -106,7 +112,11 @@ class App extends React.Component {
           selectedIndex={this.state.selectedIndex}
           onSelectIndex={(index) => this.handleSelectIndex(index)}
         />
-        <MiddleContainer selectedIndex={this.state.selectedIndex} roomList={this.state.roomList}/>
+        <MiddleContainer
+          selectedIndex={this.state.selectedIndex}
+          roomList={this.state.roomList}
+          chatList={this.state.chatList}
+        />
         <RightContainer/>
       </div>
     )

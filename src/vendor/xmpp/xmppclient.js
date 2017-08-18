@@ -145,7 +145,7 @@ class XMPPClient {
     if (handlers) {
       let index = handlers.indexOf(handler);
       if (index >= 0) {
-        handlers.slice(index, 1);
+        handlers.splice(index, 1);
       }
     }
   }
@@ -195,14 +195,16 @@ class XMPPClient {
 
   _onPresence(elem) {
     let json = this._convertXMLToJSON(elem);
-    console.log(json);
     this._runHandlers(XMPPClient.Type.PRESENCE, json);
     return true;
   }
 
   _onMessage(elem) {
-    let json = this._convertXMLToJSON(elem);
-    this._runHandlers(XMPPClient.Type.MESSAGE, json);
+    let body = elem.getElementsByTagName("body");
+    if (body && body.length > 0) {
+      let json = this._convertXMLToJSON(elem);
+      this._runHandlers(XMPPClient.Type.MESSAGE, json);
+    }
     return true;
   }
 

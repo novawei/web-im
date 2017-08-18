@@ -14,7 +14,7 @@ class ChatList extends React.Component {
         <div>消息列表</div>
         <div>
           <ul>
-            {this.props.msgList.map((msg) =>
+            {this.props.chatList.map((msg) =>
               <li key={msg.id}>{msg.from}:{msg.body.text}</li>
             )}
           </ul>
@@ -24,4 +24,4 @@ class ChatList extends React.Component {
   }
 }
 
-module.exports = RoomList;
+module.exports = ChatList;
