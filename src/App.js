@@ -2,44 +2,42 @@
  * Created by Nova on 2017/8/17.
  */
 const React = require('react');
-const XMPPClient = require('./vendor/strophe/xmppclient');
+const XMPPClient = require('./vendor/xmpp/xmppclient');
+const LeftContainer = require('./container/LeftContainer');
+const MiddleContainer = require('./container/MiddleContainer');
+const RightContainer = require('./container/RightContainer');
+require('./resource/css/app.css');
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
     this.client = XMPPClient.getInstance();
-    this.client.config('192.168.1.104', 'web-im');
+    this.client.config('10.50.200.45', 'web-im');
 
     this.handlers = [];
     this.state = {
       username: 'admin',
       status: '未登录',
+      selectedIndex: 0,
       roomList: [],
-      msgList: []
+      chatList: []
     }
   }
 
   componentWillMount() {
-    let handler;
-    handler = this.client.addHandler(XMPPClient.HandlerType.CONNECT, this.onConnect);
-    this.handlers.push(handler);
-    handler = this.client.addHandler(XMPPClient.HandlerType.IQ, this.onIQ);
-    this.handlers.push(handler);
-    handler = this.client.addHandler(XMPPClient.HandlerType.PRESENCE, this.onPresence);
-    this.handlers.push(handler);
-    handler = this.client.addHandler(XMPPClient.HandlerType.MESSAGE, this.onMessage);
-    this.handlers.push(handler);
-
+    this.handlers = this.client.addHandlers([
+      XMPPClient.buildHandler(XMPPClient.Type.CONNECT, this.onConnect.bind(this)),
+      XMPPClient.buildHandler(XMPPClient.Type.IQ, this.onIQ.bind(this)),
+      XMPPClient.buildHandler(XMPPClient.Type.PRESENCE, this.onPresence.bind(this)),
+      XMPPClient.buildHandler(XMPPClient.Type.MESSAGE, this.onMessage.bind(this))
+    ]);
     this.client.login('admin', 'admin');
   }
 
   componentWillUnmount() {
     this.client.disconnect();
-
-    for (let i = 0, len = this.handlers.length; i < len; i++) {
-      this.client.removeHandler(this.handlers[i]);
-    }
+    this.client.removeHandlers(this.handlers);
   }
 
   translateStatus(status) {
@@ -61,78 +59,55 @@ class App extends React.Component {
   onConnect(status) {
     console.log(status);
     if (status == XMPPClient.Status.SUCCESS) {
-      this.client.conn.sendPresence($pres());
+      // 请求用户的群组列表
+      let json = {query: {xmlns: 'com:nfs:mucextend:room'}};
+      this.client.sendIQ('get', null, json);
     }
   }
 
-  onIQ(element) {
-    console.log(element);
-    // let query = element.getElementsByTagName("query");
-    // if (query && query.length > 0) {
-    //   query = query[0];
-    //   if (query.getAttribute("xmlns") == 'com:nfs:mucextend:room') {
-    //     let elementList = query.getElementsByTagName("room");
-    //     let roomList = [];
-    //     for (let i = 0; i < elementList.length; i++) {
-    //       let element = elementList[i];
-    //       let room = {
-    //         roomID: element.getAttribute('roomID'),
-    //         name: element.getAttribute('name'),
-    //         naturalName: element.getAttribute('naturalName'),
-    //         description: element.getAttribute('description')
-    //       };
-    //       roomList.push(room);
-    //     }
-    //     this.setState({...this.state, roomList: roomList});
-    //   }
-    // }
-    // return true;
+  onIQ(json) {
+    console.log(json);
+
+    if (json.query && json.query.xmlns == 'com:nfs:mucextend:room') {
+      //请求房间列表返回result
+      //{xmlns: "jabber:client", type: "result", id: "01b7ca9c-78d7-4b1e-8235-ab9f0692c034:sendIQ", to: "admin@10.50.200.45/web-im", query: {…}}
+      // query:{xmlns: "com:nfs:mucextend:room", room: Array(2)}
+      this.setState({...this.state, roomList: json.query.room});
+    }
   }
 
-  onMessage(element) {
-    console.log(element);
-    // let body = element.getElementsByTagName('body');
-    // if (body && body.length > 0) {
-    //   body = body[0];
-    //   let msgList = [...this.state.msgList];
-    //   let msg = {
-    //     id: element.getAttribute('id'),
-    //     from: element.getAttribute('from'),
-    //     to: element.getAttribute('to'),
-    //     type: element.getAttribute('type'),
-    //     body: body.textContent
-    //   }
-    //   msgList.push(msg);
-    //   this.setState({...this.state, msgList: msgList});
-    // }
-    // return true;
+  onMessage(json) {
+    console.log(json);
+    let chatList = this.state.chatList;
+    for (let msg of chatList) {
+      if (msg.from  )
+    }
+    let chatMap = this.state.chatMap;
+    chatMap[json.from] = json;
+
   }
 
-  onPresence(element) {
-    console.log(element);
+  onPresence(json) {
+    console.log(json);
+  }
+
+  handleSelectIndex(index) {
+    this.setState({
+      ...this.state,
+      selectedIndex: index,
+    });
   }
 
   render() {
     return (
-      <div>
-        <div>Hello {this.state.username}!</div>
-        <div>状态：{this.state.status}</div>
-        <div>
-          <div>我的群组({this.state.roomList.length})</div>
-          <ul>
-            {this.state.roomList.map(room => (
-              <li key={room.roomID}>{room.naturalName}</li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <div>消息列表({this.state.msgList.length})</div>
-          <ul>
-            {this.state.msgList.map(msg => (
-              <li key={msg.id}>{msg.from}: {msg.body}</li>
-            ))}
-          </ul>
-        </div>
+      <div className="app">
+        <LeftContainer
+          name={this.state.username}
+          selectedIndex={this.state.selectedIndex}
+          onSelectIndex={(index) => this.handleSelectIndex(index)}
+        />
+        <MiddleContainer selectedIndex={this.state.selectedIndex} roomList={this.state.roomList}/>
+        <RightContainer/>
       </div>
     )
   }

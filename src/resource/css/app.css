@@ -1,0 +1,17 @@
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  min-height: 100vh;
+}
+
+#main {
+  flex-grow: 1;
+}
+
+.app {
+  display: flex;
+  flex-grow: 1;
+  flex-flow: row nowrap;
+  align-items: stretch;
+}
