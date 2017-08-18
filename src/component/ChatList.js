@@ -2,6 +2,8 @@
  * Created by Nova on 2017/8/18.
  */
 const React = require('react');
+const ChatItem = require('./ChatItem');
+require('../resource/css/app.css');
 
 class ChatList extends React.Component {
   constructor(props) {
@@ -10,15 +12,10 @@ class ChatList extends React.Component {
 
   render() {
     return (
-      <div>
-        <div>消息列表</div>
-        <div>
-          <ul>
-            {this.props.chatList.map((msg) =>
-              <li key={msg.id}>{msg.from}:{msg.body.text}</li>
-            )}
-          </ul>
-        </div>
+      <div className="middle">
+        {this.props.chatList.map((msg) =>
+          <ChatItem key={msg.id} msg={msg}/>
+        )}
       </div>
     )
   }

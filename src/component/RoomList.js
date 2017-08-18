@@ -2,6 +2,8 @@
  * Created by Nova on 2017/8/18.
  */
 const React = require('react');
+const RoomItem =  require('./RoomItem');
+require('../resource/css/app.css');
 
 class RoomList extends React.Component {
   constructor(props) {
@@ -10,15 +12,10 @@ class RoomList extends React.Component {
 
   render() {
     return (
-      <div>
-        <div>群组列表</div>
-        <div>
-          <ul>
-            {this.props.roomList.map((room) =>
-              <li key={room.roomID}>{room.naturalName}</li>
-            )}
-          </ul>
-        </div>
+      <div className="middle">
+        {this.props.roomList.map((room) =>
+          <RoomItem key={room.roomID} room={room}/>
+        )}
       </div>
     )
   }

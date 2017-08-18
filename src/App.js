@@ -3,9 +3,11 @@
  */
 const React = require('react');
 const XMPPClient = require('./vendor/xmpp/xmppclient');
-const LeftContainer = require('./container/LeftContainer');
-const MiddleContainer = require('./container/MiddleContainer');
-const RightContainer = require('./container/RightContainer');
+
+const Navigation = require('./component/Navigation');
+const ChatList = require('./component/ChatList');
+const RoomList = require('./component/RoomList');
+
 require('./resource/css/app.css');
 
 class App extends React.Component {
@@ -13,7 +15,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.client = XMPPClient.getInstance();
-    this.client.config('10.50.200.45', 'web-im');
+    this.client.config('192.168.1.104', 'web-im');
 
     this.handlers = [];
     this.state = {
@@ -105,19 +107,22 @@ class App extends React.Component {
   }
 
   render() {
+    let listComponent = null;
+    if (this.state.selectedIndex == 0) {
+      listComponent = <ChatList chatList={this.state.chatList}/>;
+    } else if (this.state.selectedIndex == 1) {
+
+    } else if (this.state.selectedIndex == 2) {
+      listComponent = <RoomList roomList={this.state.roomList}/>
+    }
     return (
       <div className="app">
-        <LeftContainer
-          name={this.state.username}
+        <Navigation
+          username={this.state.username}
           selectedIndex={this.state.selectedIndex}
           onSelectIndex={(index) => this.handleSelectIndex(index)}
         />
-        <MiddleContainer
-          selectedIndex={this.state.selectedIndex}
-          roomList={this.state.roomList}
-          chatList={this.state.chatList}
-        />
-        <RightContainer/>
+        {listComponent}
       </div>
     )
   }
