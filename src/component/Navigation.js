@@ -22,7 +22,7 @@ class Navigation extends React.Component {
     return (
       <div className='left'>
         <div className="avatar">
-          {this.props.username}
+
         </div>
         <div className="menu">
           {items.map((item, index, array) => (

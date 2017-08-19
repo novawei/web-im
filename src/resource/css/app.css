@@ -1,19 +1,12 @@
 body {
   margin: 0;
   padding: 0;
-  display: flex;
-  min-height: 100vh;
   background-color: #f8f8f8;
-}
-
-#main {
-  display: flex;
-  flex-grow: 1;
 }
 
 .app {
   display: flex;
-  flex-grow: 1;
+  min-height: 100vh;
   flex-flow: row nowrap;
   align-items: stretch;
 }
@@ -30,10 +23,12 @@ body {
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
+  min-width: 0;
 }
 
 .right {
   flex-grow: 3;
+  min-width: 0;
 }
 
 .avatar {
@@ -82,9 +77,11 @@ body {
   height: 44px;
   background-color: #efefef;
   border-radius: 5px;
+  flex-shrink: 0;
 }
 
 .chat-cont {
+  min-width: 0;
   padding-left: 15px;
   flex-grow: 1;
   display: flex;
@@ -109,11 +106,10 @@ body {
 }
 
 .chat-cont-bottom {
+  min-width: 0;
   color: #aaa;
   font-size: 0.9em;
-}
-
-.chat-content {
+  min-width: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

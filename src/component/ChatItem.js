@@ -10,7 +10,9 @@ class ChatItem extends React.Component {
     let from = this.props.msg.from;
     from = from.substring(0, from.indexOf('@'));
     let now = new Date();
-    now = `${now.getHours()}:${now.getMinutes()}`;
+    let fixHour = now.getHours() < 10 ? '0' : '';
+    let fixMinute = now.getMinutes() < 10 ? '0' : '';
+    now = `${fixHour}${now.getHours()}:${fixMinute}${now.getMinutes()}`;
     return (
       <div className='chat-item'>
         <div className="chat-avatar"></div>
@@ -20,7 +22,7 @@ class ChatItem extends React.Component {
             <div className="chat-time">{now}</div>
           </div>
           <div className="chat-cont-bottom">
-            <div className="chat-content">{this.props.msg.body.text}</div>
+            {this.props.msg.body.text}
           </div>
         </div>
       </div>
