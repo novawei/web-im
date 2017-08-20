@@ -47,6 +47,10 @@ class RoomChat extends React.Component {
       msgList.push(json);
       this.setState({msgList: msgList});
     }
+    let elem = document.getElementById('container');
+    setTimeout(function () {
+      elem.scrollTop = elem.scrollHeight;
+    }, 100);
   }
 
   onKeyDown(e) {
@@ -85,7 +89,7 @@ class RoomChat extends React.Component {
       <div className="right-cont">
         <div className="right">
           <div className="chat-detail-title">{roomName}</div>
-          <div className="chat-detail-cont">
+          <div className="chat-detail-cont" id="container">
             <div className="chat-detail-list">
               {this.state.msgList.map((msg) => getMsgItem(msg))}
             </div>
