@@ -12,10 +12,12 @@ class RoomList extends React.Component {
 
   render() {
     return (
-      <div className="middle">
-        {this.props.roomList.map((room) =>
-          <RoomItem key={room.roomID} room={room}/>
-        )}
+      <div className="middle-cont">
+        <div className="middle">
+          {this.props.roomList.map((room) =>
+            <RoomItem key={room.roomID} room={room}/>
+          )}
+        </div>
       </div>
     )
   }

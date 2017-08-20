@@ -7,6 +7,8 @@ const XMPPClient = require('./vendor/xmpp/xmppclient');
 const Navigation = require('./component/Navigation');
 const ChatList = require('./component/ChatList');
 const RoomList = require('./component/RoomList');
+const SingleChat = require('./component/SingleChat');
+const RoomChat = require('./component/RoomChat');
 
 require('./resource/css/app.css');
 
@@ -68,8 +70,6 @@ class App extends React.Component {
   }
 
   onIQ(json) {
-    console.log(json);
-
     if (json.query && json.query.xmlns == 'com:nfs:mucextend:room') {
       //请求房间列表返回result
       //{xmlns: "jabber:client", type: "result", id: "01b7ca9c-78d7-4b1e-8235-ab9f0692c034:sendIQ", to: "admin@10.50.200.45/web-im", query: {…}}
@@ -83,9 +83,18 @@ class App extends React.Component {
     let index = -1;
     for (let i = 0, len = chatList.length; i < len; i++) {
       let msg = chatList[i];
-      if (msg.from == json.from) {
-        index = i;
-        break;
+      if (msg.type == json.type) {
+        if (msg.type == 'groupchat') {
+          let roomJid = msg.from.split('/')[0];
+          let fromJid = json.from.split('/')[0];
+          if (roomJid == fromJid) {
+            index = i;
+            break;
+          }
+        } else if (msg.from == json.from) {
+          index = i;
+          break;
+        }
       }
     }
     if (index >= 0) {
@@ -106,10 +115,27 @@ class App extends React.Component {
     });
   }
 
+  handleSelectChat(msg) {
+    this.setState({
+      ...this.state,
+      selectedChat: msg
+    })
+  }
+
   render() {
     let listComponent = null;
+    let detailComponent = null;
     if (this.state.selectedIndex == 0) {
-      listComponent = <ChatList chatList={this.state.chatList}/>;
+      listComponent = <ChatList chatList={this.state.chatList}
+                                selectedChat={this.state.selectedChat}
+                                onSelectChat={this.handleSelectChat.bind(this)}/>;
+      if (this.state.selectedChat) {
+        if (this.state.selectedChat.type == 'groupchat') {
+          detailComponent = <RoomChat msg={this.state.selectedChat}/>
+        } else {
+          detailComponent = <SingleChat msg={this.state.selectedChat}/>
+        }
+      }
     } else if (this.state.selectedIndex == 1) {
 
     } else if (this.state.selectedIndex == 2) {
@@ -120,9 +146,10 @@ class App extends React.Component {
         <Navigation
           username={this.state.username}
           selectedIndex={this.state.selectedIndex}
-          onSelectIndex={(index) => this.handleSelectIndex(index)}
+          onSelectIndex={this.handleSelectIndex.bind(this)}
         />
         {listComponent}
+        {detailComponent}
       </div>
     )
   }

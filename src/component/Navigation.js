@@ -20,18 +20,20 @@ class Navigation extends React.Component {
     };
     const items = ['消息', '联系人', '群组'];
     return (
-      <div className='left'>
-        <div className="avatar">
+      <div className="left-cont">
+        <div className='left'>
+          <div className="menu-avatar">
 
-        </div>
-        <div className="menu">
-          {items.map((item, index, array) => (
-            <div className={getClassName(index)}
-                 key={index}
-                 onClick={() => this.handleClick(index)}>
-              {item}
-            </div>
-          ))}
+          </div>
+          <div className="menu">
+            {items.map((item, index, array) => (
+              <div className={getClassName(index)}
+                   key={index}
+                   onClick={() => this.handleClick(index)}>
+                {item}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     )

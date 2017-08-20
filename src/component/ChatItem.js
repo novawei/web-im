@@ -9,19 +9,24 @@ class ChatItem extends React.Component {
   render() {
     let from = this.props.msg.from;
     from = from.substring(0, from.indexOf('@'));
-    let now = new Date();
-    let fixHour = now.getHours() < 10 ? '0' : '';
-    let fixMinute = now.getMinutes() < 10 ? '0' : '';
-    now = `${fixHour}${now.getHours()}:${fixMinute}${now.getMinutes()}`;
+
+    const getClassName = () => {
+      if (this.props.selected) {
+        return 'chat-list-item chat-list-item-select';
+      } else {
+        return 'chat-list-item'
+      }
+    };
+
     return (
-      <div className='chat-item'>
-        <div className="chat-avatar"></div>
-        <div className="chat-cont">
-          <div className="chat-cont-top">
-            <div className="chat-name">{from}</div>
-            <div className="chat-time">{now}</div>
+      <div className={getClassName()} onClick={() => this.props.onSelect()}>
+        <div className="chat-list-avatar"></div>
+        <div className="chat-list-cont">
+          <div className="chat-list-cont-top">
+            <div className="chat-list-name">{from}</div>
+            <div className="chat-list-time">{this.props.msg.time}</div>
           </div>
-          <div className="chat-cont-bottom">
+          <div className="chat-list-cont-bottom">
             {this.props.msg.body.text}
           </div>
         </div>

@@ -8,14 +8,14 @@ class RoomItem extends React.Component {
 
   render() {
     return (
-      <div className='chat-item'>
-        <div className="chat-avatar"></div>
-        <div className="chat-cont">
-          <div className="chat-cont-top">
-            <div className="chat-name">{this.props.room.naturalName}</div>
+      <div className='chat-list-item'>
+        <div className="chat-list-avatar"></div>
+        <div className="chat-list-cont">
+          <div className="chat-list-cont-top">
+            <div className="chat-list-name">{this.props.room.naturalName}</div>
           </div>
-          <div className="chat-cont-bottom">
-            <div className="chat-content">{this.props.room.description}</div>
+          <div className="chat-list-cont-bottom">
+            {this.props.room.description}
           </div>
         </div>
       </div>

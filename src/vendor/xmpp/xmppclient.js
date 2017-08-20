@@ -54,12 +54,20 @@ class XMPPClient {
     return this.state.status;
   }
 
+  getUsername() {
+    return this.state.username;
+  }
+
+  getUserJid() {
+    return `${this.state.username}@${this.info.domain}/${this.info.resource}`;
+  }
+
   login(username, password) {
     this.state = {
       ...this.state, status: XMPPClient.Status.DOING,
       username: username, password: password
     };
-    let jid = `${username}@192.168.1.104/${this.info.resource}`;
+    let jid = `${username}@${this.info.domain}/${this.info.resource}`;
     this.conn.connect(jid, password, this._onConnect.bind(this));
   }
 
@@ -72,13 +80,20 @@ class XMPPClient {
   }
 
   sendPresence(toJid) {
+    return this.sendPresence(toJid, null);
+  }
+
+  sendPresence(toJid, json) {
     let pres = toJid ? $pres({to: toJid}) : $pres();
+    if (json) {
+      this._convertJSONToXML(pres, json);
+    }
     return this.conn.sendPresence(pres, null, null, null);
   }
 
-  sendMessage(toJid, text) {
+  sendMessage(toJid, type, text) {
     let id = this.conn.getUniqueId();
-    let msg = $msg({to: toJid, id: id}).c('body', null, text);
+    let msg = $msg({to: toJid, type: type, id: id}).c('body', null, text);
     this.conn.send(msg);
     return id;
   }
@@ -199,10 +214,20 @@ class XMPPClient {
     return true;
   }
 
+  getCurrentTime() {
+    // 设置消息接收时间
+    let now = new Date();
+    let fixHour = now.getHours() < 10 ? '0' : '';
+    let fixMinute = now.getMinutes() < 10 ? '0' : '';
+    now = `${fixHour}${now.getHours()}:${fixMinute}${now.getMinutes()}`;
+    return now;
+  }
+
   _onMessage(elem) {
     let body = elem.getElementsByTagName("body");
     if (body && body.length > 0) {
       let json = this._convertXMLToJSON(elem);
+      json.time = this.getCurrentTime();
       this._runHandlers(XMPPClient.Type.MESSAGE, json);
     }
     return true;
