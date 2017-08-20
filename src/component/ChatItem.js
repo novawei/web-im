@@ -7,9 +7,12 @@ class ChatItem extends React.Component {
   }
 
   render() {
-    let from = this.props.msg.from;
-    from = from.substring(0, from.indexOf('@'));
-
+    let from = this.props.msg.from.split('@')[0];
+    let body = this.props.msg.body.text;
+    if (this.props.msg.type == 'groupchat') {
+      let username = this.props.msg.from.split('/')[1];
+      body = `${username}:${body}`;
+    }
     const getClassName = () => {
       if (this.props.selected) {
         return 'chat-list-item chat-list-item-select';
@@ -27,7 +30,7 @@ class ChatItem extends React.Component {
             <div className="chat-list-time">{this.props.msg.time}</div>
           </div>
           <div className="chat-list-cont-bottom">
-            {this.props.msg.body.text}
+            {body}
           </div>
         </div>
       </div>

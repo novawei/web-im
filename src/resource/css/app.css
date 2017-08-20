@@ -13,6 +13,7 @@ body {
 
 .left-cont {
   background-color: #404040;
+  flex-shrink: 0;
 }
 
 .left {
@@ -26,6 +27,7 @@ body {
   min-width: 0;
   border-right: #ccc 1px solid;
   overflow-y: scroll;
+  flex-shrink: 0;
 }
 
 .middle {
@@ -150,6 +152,7 @@ body {
   flex-grow: 1;
   min-width: 0;
   overflow-y: scroll;
+  padding-bottom: 10px;
 }
 
 .chat-detail-list {
@@ -173,4 +176,81 @@ body {
   height: 100%;
   resize: none;
   outline: none;
+}
+
+.msg-list-out-cont {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+}
+
+.msg-list-item-time {
+  color: #aaa;
+  font-size: 0.8em;
+  text-align: center;
+  padding-top: 10px;
+}
+
+.msg-list-item {
+  display: flex;
+  flex-flow: row nowrap;
+  padding: 10px 10px 0px 10px;
+}
+
+.msg-list-item-select {
+  flex-flow: row-reverse nowrap;
+}
+
+.msg-list-avatar {
+  width: 30px;
+  height: 30px;
+  background-color: #efefef;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+
+.msg-list-cont {
+  min-width: 0;
+  padding: 0px 10px;
+}
+
+.room-msg-list-cont {
+  min-width: 0;
+  padding:0px 10px;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  justify-content: space-between;
+}
+
+.msg-list-content {
+  padding: 5px;
+  background-color: #fff;
+  color: #000;
+  font-size: 0.9em;
+  border-radius: 5px;
+}
+
+.msg-list-content-select {
+  background-color: #aadd00;
+}
+
+.msg-list-cont-top {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+}
+
+.msg-list-name {
+  color: #aaa;
+  font-size: 0.8em;
+}
+
+.msg-list-time {
+  color: #aaa;
+  font-size: 0.8em;
+}
+
+.msg-list-cont-bottom {
+  padding-top: 3px;
 }

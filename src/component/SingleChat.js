@@ -1,13 +1,14 @@
 const React = require('react');
-const ChatItem = require('./ChatItem');
+const MsgItem = require('./MsgItem');
 const XMPPClient = require('../vendor/xmpp/xmppclient');
 require('../resource/css/app.css');
 
 class SingleChat extends React.Component {
   constructor(props) {
     super(props);
+    this.previousTime = null;
     this.state = {
-      msgList: [props.msg]
+      msgList: []
     }
   }
 
@@ -64,17 +65,36 @@ class SingleChat extends React.Component {
   }
 
   render() {
-    let username = this.getPeerJid(this.props.msg);
-    username = username.split('@')[0];
+    let peerName = this.getPeerJid(this.props.msg);
+    peerName = peerName.split('@')[0];
+
+    const getSelected = (msg) => {
+      let fromName = msg.from.split('@')[0];
+      let username = XMPPClient.getInstance().getUsername();
+      let selected = false;
+      if (fromName == username) {
+        selected = true;
+      }
+      return selected;
+    };
+
+    this.previousTime = null;
+    const getMsgItem = (msg) => {
+      let component = <MsgItem key={msg.id}
+                               previousTime={this.previousTime}
+                               msg={msg}
+                               selected={getSelected(msg)}/>
+      this.previousTime = msg.time;
+      return component;
+    };
+
     return (
       <div className="right-cont">
         <div className="right">
-          <div className="chat-detail-title">{username}</div>
+          <div className="chat-detail-title">{peerName}</div>
           <div className="chat-detail-cont">
             <div className="chat-detail-list">
-              {this.state.msgList.map((msg) =>
-                <ChatItem key={msg.id} msg={msg}/>
-              )}
+              {this.state.msgList.map((msg) => getMsgItem(msg))}
             </div>
           </div>
           <div className="chat-detail-input">

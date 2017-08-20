@@ -1,13 +1,14 @@
 const React = require('react');
-const ChatItem = require('./ChatItem');
+const RoomMsgItem = require('./RoomMsgItem');
 const XMPPClient = require('../vendor/xmpp/xmppclient');
 require('../resource/css/app.css');
 
 class RoomChat extends React.Component {
   constructor(props) {
     super(props);
+    this.previousTime = null;
     this.state = {
-      msgList: [props.msg]
+      msgList: []
     }
   }
 
@@ -60,15 +61,33 @@ class RoomChat extends React.Component {
 
   render() {
     let roomName = this.props.msg.from.split('@')[0];
+    const getSelected = (msg) => {
+      let selected = false;
+      // if (this.props.selectedChat) {
+      //   if (this.props.selectedChat.from == msg.from) {
+      //     selected = true;
+      //   }
+      // }
+      return selected;
+    };
+
+    this.previousTime = null;
+    const getMsgItem = (msg) => {
+      let component = <RoomMsgItem key={msg.id}
+                                   previousTime={this.previousTime}
+                                   msg={msg}
+                                   selected={getSelected(msg)}/>
+      this.previousTime = msg.time;
+      return component;
+    };
+
     return (
       <div className="right-cont">
         <div className="right">
           <div className="chat-detail-title">{roomName}</div>
           <div className="chat-detail-cont">
             <div className="chat-detail-list">
-              {this.state.msgList.map((msg) =>
-                <ChatItem key={msg.id} msg={msg}/>
-              )}
+              {this.state.msgList.map((msg) => getMsgItem(msg))}
             </div>
           </div>
           <div className="chat-detail-input">
