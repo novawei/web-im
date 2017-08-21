@@ -17,7 +17,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.client = XMPPClient.getInstance();
-    this.client.config('192.168.1.104', 'web-im');
+    this.client.config('10.50.200.45', 'web-im');
 
     this.handlers = [];
     this.state = {

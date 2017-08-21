@@ -14,6 +14,7 @@ class RoomChat extends React.Component {
 
   componentWillMount() {
     this.handlers = XMPPClient.getInstance().addHandlers([
+      XMPPClient.buildHandler(XMPPClient.Type.IQ, this.onIQ.bind(this)),
       XMPPClient.buildHandler(XMPPClient.Type.MESSAGE, this.onMessage.bind(this))
     ]);
     let roomJid = this.props.msg.from.split('/')[0];
@@ -33,10 +34,28 @@ class RoomChat extends React.Component {
       }
     };
     XMPPClient.getInstance().sendPresence(roomJid, json);
+    // 获取历史消息
+    let roomName = roomJid.split('@')[0];
+    json = {query: {xmlns: 'com:nfs:msghistory:query', type: 'groupchat', roomName: roomName, pageNum: 1, pageSize: 5}};
+    XMPPClient.getInstance().sendIQ('get', null, json);
   }
 
   componentWillUnmount() {
     XMPPClient.getInstance().removeHandlers(this.handlers);
+  }
+
+  onIQ(json) {
+    if (json.type == 'result'
+      && json.query
+      && json.query.type == 'groupchat'
+      && json.query.xmlns == 'com:nfs:msghistory:query') {
+      let msgList = [...json.query.message];
+      msgList = msgList.reverse();
+      for (let msg of msgList) {
+        msg.time = XMPPClient.getTime(new Date(msg.stamp));
+        this.onMessage(msg);
+      }
+    }
   }
 
   onMessage(json) {

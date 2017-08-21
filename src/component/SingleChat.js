@@ -14,8 +14,13 @@ class SingleChat extends React.Component {
 
   componentWillMount() {
     this.handlers = XMPPClient.getInstance().addHandlers([
-      XMPPClient.buildHandler(XMPPClient.Type.MESSAGE, this.onMessage.bind(this))
+      XMPPClient.buildHandler(XMPPClient.Type.IQ, this.onIQ.bind(this)),
+      XMPPClient.buildHandler(XMPPClient.Type.MESSAGE, this.onMessage.bind(this)),
     ]);
+    // 获取历史消息
+    let peer = this.getPeerJid(this.props.msg).split('@')[0];
+    let json = {query: {xmlns: 'com:nfs:msghistory:query', type: 'chat', peer: peer, pageNum: 1, pageSize: 5}};
+    XMPPClient.getInstance().sendIQ('get', null, json);
   }
 
   componentWillUnmount() {
@@ -33,17 +38,34 @@ class SingleChat extends React.Component {
     return peerJid;
   }
 
+  onIQ(json) {
+    if (json.type == 'result'
+      && json.query
+      && json.query.type == 'chat'
+      && json.query.xmlns == 'com:nfs:msghistory:query') {
+      let msgList = [...json.query.message];
+      msgList = msgList.reverse();
+      for (let msg of msgList) {
+        msg.time = XMPPClient.getTime(new Date(msg.stamp));
+        this.onMessage(msg);
+      }
+    }
+  }
+
   onMessage(json) {
     let peerJid = this.getPeerJid(this.props.msg);
-    if (peerJid == json.from || peerJid == json.to) {
+    if (peerJid == json.from
+      || peerJid == json.to
+      || peerJid.indexOf(json.from) >= 0
+      || peerJid.indexOf(json.to) >= 0) {
       let msgList = this.state.msgList;
       msgList.push(json);
       this.setState({msgList: msgList});
+      let elem = document.getElementById('container');
+      setTimeout(function () {
+        elem.scrollTop = elem.scrollHeight;
+      }, 100);
     }
-    let elem = document.getElementById('container');
-    setTimeout(function () {
-      elem.scrollTop = elem.scrollHeight;
-    }, 100);
   }
 
   onKeyDown(e) {
@@ -58,7 +80,7 @@ class SingleChat extends React.Component {
         id: id, type: 'chat',
         from: client.getUserJid(),
         to: toJid,
-        time: client.getCurrentTime(),
+        time: XMPPClient.getCurrentTime(),
         body: {
           text: body
         }

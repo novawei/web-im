@@ -214,20 +214,21 @@ class XMPPClient {
     return true;
   }
 
-  getCurrentTime() {
-    // 设置消息接收时间
-    let now = new Date();
-    let fixHour = now.getHours() < 10 ? '0' : '';
-    let fixMinute = now.getMinutes() < 10 ? '0' : '';
-    now = `${fixHour}${now.getHours()}:${fixMinute}${now.getMinutes()}`;
-    return now;
+  static getCurrentTime() {
+    return this.getTime(new Date());
+  }
+
+  static getTime(date) {
+    let fixHour = date.getHours() < 10 ? '0' : '';
+    let fixMinute = date.getMinutes() < 10 ? '0' : '';
+    return `${fixHour}${date.getHours()}:${fixMinute}${date.getMinutes()}`;
   }
 
   _onMessage(elem) {
     let body = elem.getElementsByTagName("body");
     if (body && body.length > 0) {
       let json = this._convertXMLToJSON(elem);
-      json.time = this.getCurrentTime();
+      json.time = XMPPClient.getCurrentTime();
       this._runHandlers(XMPPClient.Type.MESSAGE, json);
     }
     return true;

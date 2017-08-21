@@ -219,7 +219,7 @@ body {
   padding:0px 10px;
   display: flex;
   flex-flow: column nowrap;
-  align-items: stretch;
+  align-items: flex-start;
   justify-content: space-between;
 }
 
