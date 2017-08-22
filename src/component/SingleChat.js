@@ -17,14 +17,19 @@ class SingleChat extends React.Component {
       XMPPClient.buildHandler(XMPPClient.Type.IQ, this.onIQ.bind(this)),
       XMPPClient.buildHandler(XMPPClient.Type.MESSAGE, this.onMessage.bind(this)),
     ]);
-    // 获取历史消息
-    let peer = this.getPeerJid(this.props.msg).split('@')[0];
-    let json = {query: {xmlns: 'com:nfs:msghistory:query', type: 'chat', peer: peer, pageNum: 1, pageSize: 5}};
-    XMPPClient.getInstance().sendIQ('get', null, json);
+    this.reloadData(this.props.msg);
   }
 
   componentWillUnmount() {
     XMPPClient.getInstance().removeHandlers(this.handlers);
+  }
+
+  reloadData(msg) {
+    this.setState({msgList: []});
+    // 获取历史消息
+    let peer = this.getPeerJid(msg).split('@')[0];
+    let json = {query: {xmlns: 'com:nfs:msghistory:query', type: 'chat', peer: peer, pageNum: 1, pageSize: 5}};
+    XMPPClient.getInstance().sendIQ('get', null, json);
   }
 
   getPeerJid(msg) {

@@ -203,7 +203,6 @@ class XMPPClient {
   }
 
   _onIQ(elem) {
-    console.log(elem);
     let json = this._convertXMLToJSON(elem);
     this._runHandlers(XMPPClient.Type.IQ, json);
     return true;

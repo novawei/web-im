@@ -17,7 +17,23 @@ class RoomChat extends React.Component {
       XMPPClient.buildHandler(XMPPClient.Type.IQ, this.onIQ.bind(this)),
       XMPPClient.buildHandler(XMPPClient.Type.MESSAGE, this.onMessage.bind(this))
     ]);
-    let roomJid = this.props.msg.from.split('/')[0];
+    this.reloadData(this.props.msg);
+  }
+
+  componentWillUnmount() {
+    XMPPClient.getInstance().removeHandlers(this.handlers);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.msg != nextProps.msg) {
+      this.reloadData(nextProps.msg);
+    }
+  }
+
+  reloadData(msg) {
+    this.setState({msgList: []});
+
+    let roomJid = msg.from.split('/')[0];
     roomJid = `${roomJid}/${XMPPClient.getInstance().getUsername()}`;
     /**
      * MUC ROOM
@@ -38,10 +54,6 @@ class RoomChat extends React.Component {
     let roomName = roomJid.split('@')[0];
     json = {query: {xmlns: 'com:nfs:msghistory:query', type: 'groupchat', roomName: roomName, pageNum: 1, pageSize: 5}};
     XMPPClient.getInstance().sendIQ('get', null, json);
-  }
-
-  componentWillUnmount() {
-    XMPPClient.getInstance().removeHandlers(this.handlers);
   }
 
   onIQ(json) {
