@@ -106,7 +106,6 @@ class XMPPClient {
   sendIQ(type, toJid, json) {
     let iq = toJid ? $iq({type: type, to: toJid}) : $iq({type: type});
     this._convertJSONToXML(iq, json);
-    console.log(iq);
     return this.conn.sendIQ(iq, null, null, null);
   }
 

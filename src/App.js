@@ -64,7 +64,7 @@ class App extends React.Component {
     console.log(status);
     if (status == XMPPClient.Status.SUCCESS) {
       // 请求用户的群组列表
-      let json = {query: {xmlns: 'com:nfs:mucextend', cmd: 'user:room:list'}};
+      let json = {query: {xmlns: 'com:nfs:mucextend:room:list'}};
       this.client.sendIQ('get', null, json);
     }
   }
