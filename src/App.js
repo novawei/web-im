@@ -64,13 +64,14 @@ class App extends React.Component {
     console.log(status);
     if (status == XMPPClient.Status.SUCCESS) {
       // 请求用户的群组列表
-      let json = {query: {xmlns: 'com:nfs:mucextend:room'}};
+      let json = {query: {xmlns: 'com:nfs:mucextend', cmd: 'user:room:list'}};
       this.client.sendIQ('get', null, json);
     }
   }
 
   onIQ(json) {
-    if (json.query && json.query.xmlns == 'com:nfs:mucextend:room') {
+    if (json.query
+      && json.query.xmlns == 'com:nfs:mucextend:room:list') {
       //请求房间列表返回result
       //{xmlns: "jabber:client", type: "result", id: "01b7ca9c-78d7-4b1e-8235-ab9f0692c034:sendIQ", to: "admin@10.50.200.45/web-im", query: {…}}
       // query:{xmlns: "com:nfs:mucextend:room", room: Array(2)}
